@@ -1,10 +1,11 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
+import CategoryFilter from "./CategoryFilter";
 
 const GameList = () => {
   const [games, setGames] = useState([]);
   const [filteredGames, setFilteredGames] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [search, setSearch] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
   const [hasDemo, setHasDemo] = useState(null);
@@ -27,11 +28,13 @@ const GameList = () => {
               Mobile: true,
               Page: 0,
               BrandId: null,
+              CategoryId: selectedCategory || null, // Include selected category
             }),
           }
         );
         const data = await response.json();
-        setGames(data);
+        console.log("Games API Response:", data); // Debug log
+        setGames(data); // Update games list
         setFilteredGames(data); // Initialize filtered games
       } catch (error) {
         console.error("Error fetching games:", error);
@@ -39,10 +42,9 @@ const GameList = () => {
     };
 
     fetchGames();
-  }, []);
+  }, [selectedCategory]); // Re-fetch games when category changes
 
   useEffect(() => {
-    // Apply filters whenever search, selectedBrand, or hasDemo changes
     let updatedGames = [...games];
 
     if (search) {
@@ -66,6 +68,8 @@ const GameList = () => {
 
   return (
     <div>
+      <CategoryFilter onCategorySelect={setSelectedCategory} />
+
       <div>
         <input
           type="text"
