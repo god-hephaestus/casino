@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import CategoryFilter from "./CategoryFilter";
+import BrandFilter from "./BrandFilter";
 
 const GameList = () => {
   const [games, setGames] = useState([]);
@@ -27,7 +28,7 @@ const GameList = () => {
               GameType: "slot_game",
               Mobile: true,
               Page: 0,
-              BrandId: null,
+              BrandId: selectedBrand || null, // Include selected brand
               CategoryId: selectedCategory || null, // Include selected category
             }),
           }
@@ -42,7 +43,7 @@ const GameList = () => {
     };
 
     fetchGames();
-  }, [selectedCategory]); // Re-fetch games when category changes
+  }, [selectedCategory, selectedBrand]); // Re-fetch games when category or brand changes
 
   useEffect(() => {
     let updatedGames = [...games];
@@ -53,22 +54,17 @@ const GameList = () => {
       );
     }
 
-    if (selectedBrand) {
-      updatedGames = updatedGames.filter(
-        (game) => game.BrandName.toLowerCase() === selectedBrand.toLowerCase()
-      );
-    }
-
     if (hasDemo !== null) {
       updatedGames = updatedGames.filter((game) => game.HasDemo === hasDemo);
     }
 
     setFilteredGames(updatedGames);
-  }, [search, selectedBrand, hasDemo, games]);
+  }, [search, hasDemo, games]);
 
   return (
     <div>
       <CategoryFilter onCategorySelect={setSelectedCategory} />
+      <BrandFilter onBrandSelect={setSelectedBrand} />
 
       <div>
         <input
@@ -77,20 +73,6 @@ const GameList = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-
-        <select
-          onChange={(e) => setSelectedBrand(e.target.value)}
-          value={selectedBrand}
-        >
-          <option value="">All Providers</option>
-          {Array.from(new Set(games.map((game) => game.BrandName))).map(
-            (brand) => (
-              <option key={brand} value={brand}>
-                {brand}
-              </option>
-            )
-          )}
-        </select>
 
         <button onClick={() => setHasDemo(true)}>Has Demo</button>
         <button onClick={() => setHasDemo(false)}>No Demo</button>
