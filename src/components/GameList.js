@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // Correct import for client components
+import { useRouter } from "next/navigation"; // For client-side routing
 import CategoryFilter from "./CategoryFilter";
 import BrandFilter from "./BrandFilter";
 
-const GameList = () => {
+const GameList = ({ slug }) => {
   const router = useRouter();
 
   const [games, setGames] = useState([]);
@@ -14,17 +14,19 @@ const GameList = () => {
   const [search, setSearch] = useState("");
   const [hasDemo, setHasDemo] = useState(null);
 
-  // Initialize filters from URL
+  // Handle slug and initialize filters
   useEffect(() => {
-    const path = window.location.pathname;
-    const segments = path.split("/").filter(Boolean); // Remove empty segments
+    if (!slug || slug.length === 0) {
+      // No slug means we're on the root route
+      setSelectedCategory("");
+      setSelectedBrand("");
+      return;
+    }
 
-    const categorySegment = segments.find((segment) =>
+    const categorySegment = slug.find((segment) =>
       segment.startsWith("category-")
     );
-    const brandSegment = segments.find((segment) =>
-      segment.startsWith("brand-")
-    );
+    const brandSegment = slug.find((segment) => segment.startsWith("brand-"));
 
     if (categorySegment) {
       const category = categorySegment.replace("category-", "");
@@ -35,18 +37,23 @@ const GameList = () => {
       const brand = brandSegment.replace("brand-", "");
       setSelectedBrand(brand);
     }
-  }, []);
+  }, [slug]);
 
-  // Update URL when filters change without reloading
-  useEffect(() => {
+  // Update URL dynamically without navigation
+  const updateURL = () => {
     const newPath = [
       selectedCategory && `category-${selectedCategory}`,
       selectedBrand && `brand-${selectedBrand}`,
     ]
-      .filter(Boolean) // Remove empty values
+      .filter(Boolean)
       .join("/");
 
     router.push(`/${newPath}`, { shallow: true });
+  };
+
+  // Update filters and URL when category/brand changes
+  useEffect(() => {
+    updateURL();
   }, [selectedCategory, selectedBrand]);
 
   // Fetch games when category or brand changes
@@ -83,7 +90,7 @@ const GameList = () => {
     fetchGames();
   }, [selectedCategory, selectedBrand]);
 
-  // Apply client-side filtering
+  // Client-side filtering
   useEffect(() => {
     let updatedGames = [...games];
 
