@@ -1,16 +1,55 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // Correct import for client components
 import CategoryFilter from "./CategoryFilter";
 import BrandFilter from "./BrandFilter";
 
 const GameList = () => {
+  const router = useRouter();
+
   const [games, setGames] = useState([]);
   const [filteredGames, setFilteredGames] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [search, setSearch] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
+  const [search, setSearch] = useState("");
   const [hasDemo, setHasDemo] = useState(null);
 
+  // Initialize filters from URL
+  useEffect(() => {
+    const path = window.location.pathname;
+    const segments = path.split("/").filter(Boolean); // Remove empty segments
+
+    const categorySegment = segments.find((segment) =>
+      segment.startsWith("category-")
+    );
+    const brandSegment = segments.find((segment) =>
+      segment.startsWith("brand-")
+    );
+
+    if (categorySegment) {
+      const category = categorySegment.replace("category-", "");
+      setSelectedCategory(category);
+    }
+
+    if (brandSegment) {
+      const brand = brandSegment.replace("brand-", "");
+      setSelectedBrand(brand);
+    }
+  }, []);
+
+  // Update URL when filters change without reloading
+  useEffect(() => {
+    const newPath = [
+      selectedCategory && `category-${selectedCategory}`,
+      selectedBrand && `brand-${selectedBrand}`,
+    ]
+      .filter(Boolean) // Remove empty values
+      .join("/");
+
+    router.push(`/${newPath}`, { shallow: true });
+  }, [selectedCategory, selectedBrand]);
+
+  // Fetch games when category or brand changes
   useEffect(() => {
     const fetchGames = async () => {
       try {
@@ -28,23 +67,23 @@ const GameList = () => {
               GameType: "slot_game",
               Mobile: true,
               Page: 0,
-              BrandId: selectedBrand || null, // Include selected brand
-              CategoryId: selectedCategory || null, // Include selected category
+              BrandId: selectedBrand || null,
+              CategoryId: selectedCategory || null,
             }),
           }
         );
         const data = await response.json();
-        console.log("Games API Response:", data); // Debug log
-        setGames(data); // Update games list
-        setFilteredGames(data); // Initialize filtered games
+        setGames(data);
+        setFilteredGames(data);
       } catch (error) {
         console.error("Error fetching games:", error);
       }
     };
 
     fetchGames();
-  }, [selectedCategory, selectedBrand]); // Re-fetch games when category or brand changes
+  }, [selectedCategory, selectedBrand]);
 
+  // Apply client-side filtering
   useEffect(() => {
     let updatedGames = [...games];
 
