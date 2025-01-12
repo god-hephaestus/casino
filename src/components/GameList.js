@@ -1,64 +1,23 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // For client-side routing
+import React, { useState, useEffect, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation"; // For routing and query params
 import CategoryFilter from "./CategoryFilter";
 import BrandFilter from "./BrandFilter";
 
-const GameList = ({ slug }) => {
+const GameList = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [games, setGames] = useState([]);
-  const [filteredGames, setFilteredGames] = useState([]);
+  const [allGames, setAllGames] = useState([]); // Store all games initially
+  const [filteredGames, setFilteredGames] = useState([]); // Store filtered games
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
   const [search, setSearch] = useState("");
-  const [hasDemo, setHasDemo] = useState(null);
 
-  // Handle slug and initialize filters
+  // Fetch all games on initial load
   useEffect(() => {
-    if (!slug || slug.length === 0) {
-      // No slug means we're on the root route
-      setSelectedCategory("");
-      setSelectedBrand("");
-      return;
-    }
-
-    const categorySegment = slug.find((segment) =>
-      segment.startsWith("category-")
-    );
-    const brandSegment = slug.find((segment) => segment.startsWith("brand-"));
-
-    if (categorySegment) {
-      const category = categorySegment.replace("category-", "");
-      setSelectedCategory(category);
-    }
-
-    if (brandSegment) {
-      const brand = brandSegment.replace("brand-", "");
-      setSelectedBrand(brand);
-    }
-  }, [slug]);
-
-  // Update URL dynamically without navigation
-  const updateURL = () => {
-    const newPath = [
-      selectedCategory && `category-${selectedCategory}`,
-      selectedBrand && `brand-${selectedBrand}`,
-    ]
-      .filter(Boolean)
-      .join("/");
-
-    router.push(`/${newPath}`, { shallow: true });
-  };
-
-  // Update filters and URL when category/brand changes
-  useEffect(() => {
-    updateURL();
-  }, [selectedCategory, selectedBrand]);
-
-  // Fetch games when category or brand changes
-  useEffect(() => {
-    const fetchGames = async () => {
+    const fetchAllGames = async () => {
+      console.log("Fetching all games from the API...");
       try {
         const response = await fetch(
           "https://prod-api.bookiewiseapi.com/Games/GamesByBrand?lang=tr&siteId=50",
@@ -74,38 +33,86 @@ const GameList = ({ slug }) => {
               GameType: "slot_game",
               Mobile: true,
               Page: 0,
-              BrandId: selectedBrand || null,
-              CategoryId: selectedCategory || null,
+              BrandId: null,
+              CategoryId: null,
             }),
           }
         );
+
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`);
+
         const data = await response.json();
-        setGames(data);
-        setFilteredGames(data);
+        console.log("All games fetched successfully:", data);
+        setAllGames(data);
+        setFilteredGames(data); // Initialize filtered games with all data
       } catch (error) {
         console.error("Error fetching games:", error);
       }
     };
 
-    fetchGames();
-  }, [selectedCategory, selectedBrand]);
+    fetchAllGames();
+  }, []);
 
-  // Client-side filtering
+  // Parse query parameters and update filters
   useEffect(() => {
-    let updatedGames = [...games];
+    const params = new URLSearchParams(searchParams.toString());
+    const category = params.get("category") || "";
+    const brand = params.get("brand") || "";
+    const searchQuery = params.get("search") || "";
 
-    if (search) {
-      updatedGames = updatedGames.filter((game) =>
-        game.Name.toLowerCase().includes(search.toLowerCase())
-      );
-    }
+    setSelectedCategory(category);
+    setSelectedBrand(brand);
+    setSearch(searchQuery);
+  }, [searchParams]);
 
-    if (hasDemo !== null) {
-      updatedGames = updatedGames.filter((game) => game.HasDemo === hasDemo);
-    }
+  // Update URL dynamically (shallow routing) when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
 
-    setFilteredGames(updatedGames);
-  }, [search, hasDemo, games]);
+    if (selectedCategory) params.set("category", selectedCategory);
+    if (selectedBrand) params.set("brand", selectedBrand);
+    if (search) params.set("search", search);
+
+    const newQuery = params.toString();
+    console.log("Updating URL with query parameters:", newQuery);
+    router.push(`?${newQuery}`, { shallow: true });
+  }, [selectedCategory, selectedBrand, search]);
+
+  // Filter games based on the current filters
+  useEffect(() => {
+    const filterGames = () => {
+      console.log("Filtering games based on query parameters...");
+      let filtered = [...allGames];
+
+      if (selectedCategory) {
+        filtered = filtered.filter(
+          (game) => game.CategoryId === parseInt(selectedCategory)
+        );
+      }
+
+      if (selectedBrand) {
+        filtered = filtered.filter(
+          (game) => game.BrandId === parseInt(selectedBrand)
+        );
+      }
+
+      if (search) {
+        filtered = filtered.filter((game) =>
+          game.Name.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+
+      console.log("Filtered games:", filtered);
+      setFilteredGames(filtered);
+    };
+
+    filterGames();
+  }, [selectedCategory, selectedBrand, search, allGames]);
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+  };
 
   return (
     <div>
@@ -117,23 +124,23 @@ const GameList = ({ slug }) => {
           type="text"
           placeholder="Search by name..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={handleSearchChange}
         />
-
-        <button onClick={() => setHasDemo(true)}>Has Demo</button>
-        <button onClick={() => setHasDemo(false)}>No Demo</button>
-        <button onClick={() => setHasDemo(null)}>All</button>
       </div>
 
       <div className="game-grid">
-        {filteredGames.map((game) => (
-          <div key={game.Id} className="game-card">
-            <img src={game.ImageUrl.trim()} alt={game.Name} />
-            <h3>{game.Name}</h3>
-            <p>Provider: {game.BrandName}</p>
-            {game.HasDemo && <button>Play Demo</button>}
-          </div>
-        ))}
+        {filteredGames.length > 0 ? (
+          filteredGames.map((game) => (
+            <div key={game.Id} className="game-card">
+              <img src={game.ImageUrl.trim()} alt={game.Name} />
+              <h3>{game.Name}</h3>
+              <p>Provider: {game.BrandName}</p>
+              {game.HasDemo && <button>Play Demo</button>}
+            </div>
+          ))
+        ) : (
+          <p>No games found.</p>
+        )}
       </div>
     </div>
   );
