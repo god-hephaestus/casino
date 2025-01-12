@@ -23,13 +23,13 @@ const CategoryFilter = ({ onCategorySelect }) => {
         );
         const data = await response.json();
         if (data.Success && Array.isArray(data.Data)) {
-          setCategories(data.Data); // Use the Data array
+          setCategories(data.Data);
         } else {
-          setCategories([]); // Handle unexpected structure
+          setCategories([]);
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
-        setCategories([]); // Fallback to empty array
+        setCategories([]);
       }
     };
 
@@ -38,7 +38,7 @@ const CategoryFilter = ({ onCategorySelect }) => {
 
   const handleCategorySelect = (categoryId) => {
     setSelectedCategory(categoryId);
-    onCategorySelect(categoryId); // Pass selected category ID to parent
+    onCategorySelect(categoryId);
   };
 
   return (
@@ -53,6 +53,15 @@ const CategoryFilter = ({ onCategorySelect }) => {
           onClick={() => handleCategorySelect("")}
         >
           All
+        </li>
+        <li
+          style={{
+            cursor: "pointer",
+            fontWeight: selectedCategory === "favorites" ? "bold" : "normal",
+          }}
+          onClick={() => handleCategorySelect("favorites")}
+        >
+          Favorites
         </li>
         {categories.map((category) => (
           <li

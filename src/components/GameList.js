@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect, useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation"; // For routing and query params
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import CategoryFilter from "./CategoryFilter";
 import BrandFilter from "./BrandFilter";
 
@@ -13,6 +13,7 @@ const GameList = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
   const [search, setSearch] = useState("");
+  const [favorites, setFavorites] = useState([]);
 
   // Fetch all games on initial load
   useEffect(() => {
@@ -54,6 +55,19 @@ const GameList = () => {
     fetchAllGames();
   }, []);
 
+  // Load favorites from localStorage on initial render
+  useEffect(() => {
+    const storedFavorites = localStorage.getItem("favoriteGames");
+    if (storedFavorites) {
+      setFavorites(JSON.parse(storedFavorites));
+    }
+  }, []);
+
+  // Save favorites to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("favoriteGames", JSON.stringify(favorites));
+  }, [favorites]);
+
   // Parse query parameters and update filters
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
@@ -85,7 +99,9 @@ const GameList = () => {
       console.log("Filtering games based on query parameters...");
       let filtered = [...allGames];
 
-      if (selectedCategory) {
+      if (selectedCategory === "favorites") {
+        filtered = filtered.filter((game) => favorites.includes(game.Id));
+      } else if (selectedCategory) {
         filtered = filtered.filter(
           (game) => game.CategoryId === parseInt(selectedCategory)
         );
@@ -108,10 +124,20 @@ const GameList = () => {
     };
 
     filterGames();
-  }, [selectedCategory, selectedBrand, search, allGames]);
+  }, [selectedCategory, selectedBrand, search, favorites, allGames]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
+  };
+
+  const toggleFavorite = (gameId) => {
+    setFavorites((prevFavorites) => {
+      if (prevFavorites.includes(gameId)) {
+        return prevFavorites.filter((id) => id !== gameId);
+      } else {
+        return [...prevFavorites, gameId];
+      }
+    });
   };
 
   return (
@@ -136,6 +162,9 @@ const GameList = () => {
               <h3>{game.Name}</h3>
               <p>Provider: {game.BrandName}</p>
               {game.HasDemo && <button>Play Demo</button>}
+              <button onClick={() => toggleFavorite(game.Id)}>
+                {favorites.includes(game.Id) ? "Unfavorite" : "Favorite"}
+              </button>
             </div>
           ))
         ) : (
