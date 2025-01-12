@@ -19,3 +19,28 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.favorite-button {
+  background-color: rgba(255, 140, 0, 1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  opacity: 1;
+}
+
+.star {
+  width: 16px;
+  height: 16px;
+  display: block;
+  background: black;
+  mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.425 8.2 1.18-5.934 5.786 1.4 8.175L12 18.896l-7.334 3.857 1.4-8.175L.132 9.192l8.2-1.18L12 .587z"/></svg>')
+    no-repeat center;
+  -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.425 8.2 1.18-5.934 5.786 1.4 8.175L12 18.896l-7.334 3.857 1.4-8.175L.132 9.192l8.2-1.18L12 .587z"/></svg>')
+    no-repeat center;
+  mask-size: cover;
+  -webkit-mask-size: cover;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.star.favorited {
+  background: yellow;
+  transform: scale(1.2);
+}

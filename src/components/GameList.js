@@ -141,34 +141,65 @@ const GameList = () => {
   };
 
   return (
-    <div>
+    <div className="p-4">
       <CategoryFilter onCategorySelect={setSelectedCategory} />
       <BrandFilter onBrandSelect={setSelectedBrand} />
 
-      <div>
+      <div className="mb-4">
         <input
           type="text"
           placeholder="Search by name..."
           value={search}
           onChange={handleSearchChange}
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
-      <div className="game-grid">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8 gap-4">
         {filteredGames.length > 0 ? (
           filteredGames.map((game) => (
-            <div key={game.Id} className="game-card">
-              <img src={game.ImageUrl.trim()} alt={game.Name} />
-              <h3>{game.Name}</h3>
-              <p>Provider: {game.BrandName}</p>
-              {game.HasDemo && <button>Play Demo</button>}
-              <button onClick={() => toggleFavorite(game.Id)}>
-                {favorites.includes(game.Id) ? "Unfavorite" : "Favorite"}
-              </button>
+            <div key={game.Id} className="text-center">
+              {/* Game Image with Hover Effect */}
+              <div
+                className="relative w-full h-40 bg-center bg-cover rounded-xl overflow-hidden group"
+                style={{ backgroundImage: `url(${game.ImageUrl.trim()})` }}
+              >
+                {/* Favorite Button */}
+                <button
+                  onClick={() => toggleFavorite(game.Id)}
+                  className="absolute top-2 right-2 w-9 h-9 rounded-full flex items-center justify-center transition-transform duration-200 hover:scale-110 z-20 favorite-button group-hover:opacity-100 opacity-90"
+                >
+                  <span
+                    className={`star ${
+                      favorites.includes(game.Id) ? "favorited" : ""
+                    }`}
+                  ></span>
+                </button>
+
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-70 transition-all duration-300 z-10"></div>
+
+                {/* Hidden Content, Visible on Hover */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                  <p className="font-semibold text-xs">{game.BrandName}</p>
+                  <div className="my-2"></div>
+                  <button className="px-4 py-2 bg-[#efbe30] min-w-[50%] rounded text-black flex items-center justify-center gap-2 hover:bg-[#a2802e]">
+                    <span className="text-xs font-semibold">Play Now</span>
+                  </button>
+                  {game.HasDemo && (
+                    <button className="mt-2 px-4 py-2 bg-[#007d2d] min-w-[50%] text-xs rounded text-white flex items-center justify-center gap-2 hover:bg-[#00491f]">
+                      Play Demo
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Game Name */}
+              <h3 className="mt-2 text-sm font-semibold">{game.Name}</h3>
             </div>
           ))
         ) : (
-          <p>No games found.</p>
+          <p className="col-span-full text-center">No games found.</p>
         )}
       </div>
     </div>

@@ -43,7 +43,7 @@ const CategoryFilter = ({ onCategorySelect }) => {
 
   return (
     <div>
-      <h3>Categories</h3>
+      <h3 className="text-yellow-500">Categories</h3>
       <ul>
         <li
           style={{
