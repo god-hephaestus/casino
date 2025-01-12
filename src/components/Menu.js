@@ -23,9 +23,9 @@ const Menu = () => {
           }
         );
         const data = await response.json();
-        console.log("Menu API Response:", data); // Debug log
+        console.log("Menu API Response:", data);
         if (Array.isArray(data)) {
-          setMenuItems(data.filter((item) => item.IsActive)); // Only include active menus
+          setMenuItems(data.filter((item) => item.IsActive));
         }
       } catch (error) {
         console.error("Error fetching menu:", error);
@@ -36,18 +36,29 @@ const Menu = () => {
   }, []);
 
   const renderMenu = (menu, parentKey = "") => {
-    // Generate a fully unique key by combining MenuKey, UrlRoute, and OrderIndex
+    // Generate a fully unique key for each menu item
     const uniqueKey = `${parentKey}-${menu.MenuKey}-${
       menu.UrlRoute || menu.OrderIndex || "default"
     }`;
 
     return (
-      <li key={uniqueKey} style={{ paddingLeft: "20px" }}>
-        <a href={menu.UrlRoute || "#"}>
-          {menu.MenuIcon && <i className={menu.MenuIcon}></i>} {menu.MenuText}
+      <li key={uniqueKey}>
+        <a
+          href={menu.IsUnderMaintenance ? null : menu.UrlRoute || "#"}
+          className={`${
+            menu.IsUnderMaintenance ? "text-gray-500 cursor-not-allowed" : ""
+          } flex items-center`}
+          title={
+            menu.IsUnderMaintenance ? "This section is under maintenance" : ""
+          }
+        >
+          {menu.MenuIcon && <i className={`${menu.MenuIcon} mr-2`}></i>}
+          <span>{menu.MenuText}</span>
+          {menu.IsNew && <span className="ml-2 text-red-500 text-xs">NEW</span>}
         </a>
+
         {menu.Children && menu.Children.length > 0 && (
-          <ul>
+          <ul className="pl-4">
             {menu.Children.filter((child) => child.IsActive).map((child) =>
               renderMenu(child, uniqueKey)
             )}
@@ -59,7 +70,16 @@ const Menu = () => {
 
   return (
     <nav>
-      <ul>{menuItems.map((menu) => renderMenu(menu))}</ul>
+      <ul>
+        {menuItems.map((menu) => (
+          <li
+            key={menu.MenuKey}
+            className={menu.IsHiddenOnMobile ? "hidden lg:block" : ""}
+          >
+            <ul>{renderMenu(menu)}</ul>
+          </li>
+        ))}
+      </ul>
     </nav>
   );
 };
