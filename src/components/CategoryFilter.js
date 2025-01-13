@@ -43,14 +43,11 @@ const CategoryFilter = ({ onCategorySelect }) => {
 
   return (
     <div>
-      <h3 className="text-black h-[30px] mt-[20px] mx-[5px] pl-[6px] text-[1.1rem] font-semibold">
-        Categories
-      </h3>
-      <ul>
+      <ul className="flex gap-4 p-2">
         <li
-          className={`text-sm cursor-pointer p-2 rounded ${
+          className={`text-sm cursor-pointer px-4 py-2 rounded ${
             selectedCategory === ""
-              ? "bg-[#2f2f2f] text-white border-l-4 border-[#007d2d]"
+              ? "bg-[#2f2f2f] text-white border-b-4 border-[#007d2d]"
               : "text-black hover:bg-gray-200"
           }`}
           onClick={() => handleCategorySelect("")}
@@ -58,9 +55,9 @@ const CategoryFilter = ({ onCategorySelect }) => {
           All
         </li>
         <li
-          className={`text-sm cursor-pointer p-2 rounded ${
+          className={`text-sm cursor-pointer px-4 py-2 rounded ${
             selectedCategory === "favorites"
-              ? "bg-[#2f2f2f] text-white border-l-4 border-[#007d2d]"
+              ? "bg-[#2f2f2f] text-white border-b-4 border-[#007d2d]"
               : "text-black hover:bg-gray-200"
           }`}
           onClick={() => handleCategorySelect("favorites")}
@@ -70,9 +67,9 @@ const CategoryFilter = ({ onCategorySelect }) => {
         {categories.map((category) => (
           <li
             key={category.Id}
-            className={`text-sm cursor-pointer p-2 rounded ${
+            className={`text-sm cursor-pointer px-4 py-2 rounded ${
               selectedCategory === category.Id
-                ? "bg-[#2f2f2f] text-white border-l-4 border-[#007d2d]"
+                ? "bg-[#2f2f2f] text-white border-b-4 border-[#007d2d]"
                 : "text-black hover:bg-gray-200"
             }`}
             onClick={() => handleCategorySelect(category.Id)}
