@@ -43,7 +43,7 @@ const CategoryFilter = ({ onCategorySelect }) => {
 
   return (
     <div>
-      <ul className="flex gap-4 p-2">
+      <ul className="flex flex-wrap gap-4 p-2">
         <li
           className={`text-sm text-white  cursor-pointer px-4 py-2 rounded ${
             selectedCategory === ""

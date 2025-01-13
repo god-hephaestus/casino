@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CategoryFilter from "./CategoryFilter";
 import BrandFilter from "./BrandFilter";
+import MobileBarPopup from "./MobileBarPopup"; // Import the new component
 
 const GameList = () => {
   const router = useRouter();
@@ -14,11 +15,6 @@ const GameList = () => {
   const [selectedBrands, setSelectedBrands] = useState([]); // Updated to support multiple selections
   const [search, setSearch] = useState("");
   const [favorites, setFavorites] = useState([]);
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setSidebarOpen((prev) => !prev);
-  };
 
   useEffect(() => {
     const fetchAllGames = async () => {
@@ -144,13 +140,13 @@ const GameList = () => {
     <div className="flex flex-col h-screen bg-[#f2f2f2]">
       <header className="w-full bg-[#181818] shadow sticky top-0 z-50">
         <div className="p-4 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 hidden md:block">
             <CategoryFilter
               selectedCategory={selectedCategory}
               onCategorySelect={setSelectedCategory}
             />
           </div>
-          <div className="flex items-center gap-4 ">
+          <div className="flex items-center gap-4">
             <div className="relative">
               <BrandFilter
                 selectedBrand={selectedBrands}
@@ -226,6 +222,8 @@ const GameList = () => {
           )}
         </div>
       </main>
+
+      <MobileBarPopup />
     </div>
   );
 };
