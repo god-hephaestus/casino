@@ -23,12 +23,6 @@ export default function MobileBarPopup() {
 
   return (
     <div>
-      <div className="hidden lg:block">
-        <CategoryFilter
-          onCategorySelect={(categoryId) => console.log(categoryId)}
-        />
-      </div>
-
       <div className="fixed bottom-0 w-full z-[500] h-[10%] bg-[#ffffff] flex justify-between items-center lg:hidden">
         <div
           className={`flex-1 flex flex-col h-full items-center justify-center cursor-pointer ${
