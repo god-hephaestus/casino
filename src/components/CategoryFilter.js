@@ -45,20 +45,20 @@ const CategoryFilter = ({ onCategorySelect }) => {
     <div>
       <ul className="flex gap-4 p-2">
         <li
-          className={`text-sm cursor-pointer px-4 py-2 rounded ${
+          className={`text-sm text-white  cursor-pointer px-4 py-2 rounded ${
             selectedCategory === ""
-              ? "bg-[#2f2f2f] text-white border-b-4 border-[#007d2d]"
-              : "text-black hover:bg-gray-200"
+              ? "bg-[#2f2f2f] border-b-4 border-[#007d2d]"
+              : "hover:border-b-4 hover:border-[#007d2d]"
           }`}
           onClick={() => handleCategorySelect("")}
         >
           All
         </li>
         <li
-          className={`text-sm cursor-pointer px-4 py-2 rounded ${
+          className={`text-sm text-white  cursor-pointer px-4 py-2 rounded ${
             selectedCategory === "favorites"
-              ? "bg-[#2f2f2f] text-white border-b-4 border-[#007d2d]"
-              : "text-black hover:bg-gray-200"
+              ? "bg-[#2f2f2f] border-b-4 border-[#007d2d]"
+              : "hover:border-b-4 hover:border-[#007d2d]"
           }`}
           onClick={() => handleCategorySelect("favorites")}
         >
@@ -67,10 +67,10 @@ const CategoryFilter = ({ onCategorySelect }) => {
         {categories.map((category) => (
           <li
             key={category.Id}
-            className={`text-sm cursor-pointer px-4 py-2 rounded ${
+            className={`text-sm text-white cursor-pointer px-4 py-2 rounded ${
               selectedCategory === category.Id
-                ? "bg-[#2f2f2f] text-white border-b-4 border-[#007d2d]"
-                : "text-black hover:bg-gray-200"
+                ? "bg-[#2f2f2f] border-b-4 border-[#007d2d]"
+                : "hover:border-b-4 hover:border-[#007d2d]"
             }`}
             onClick={() => handleCategorySelect(category.Id)}
           >

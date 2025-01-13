@@ -8,10 +8,10 @@ const GameList = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [allGames, setAllGames] = useState([]); // Store all games initially
-  const [filteredGames, setFilteredGames] = useState([]); // Store filtered games
+  const [allGames, setAllGames] = useState([]);
+  const [filteredGames, setFilteredGames] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedBrand, setSelectedBrand] = useState("");
+  const [selectedBrands, setSelectedBrands] = useState([]); // Updated to support multiple selections
   const [search, setSearch] = useState("");
   const [favorites, setFavorites] = useState([]);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -19,7 +19,7 @@ const GameList = () => {
   const toggleSidebar = () => {
     setSidebarOpen((prev) => !prev);
   };
-  // Fetch all games on initial load
+
   useEffect(() => {
     const fetchAllGames = async () => {
       console.log("Fetching all games from the API...");
@@ -50,7 +50,7 @@ const GameList = () => {
         const data = await response.json();
         console.log("All games fetched successfully:", data);
         setAllGames(data);
-        setFilteredGames(data); // Initialize filtered games with all data
+        setFilteredGames(data);
       } catch (error) {
         console.error("Error fetching games:", error);
       }
@@ -59,7 +59,6 @@ const GameList = () => {
     fetchAllGames();
   }, []);
 
-  // Load favorites from localStorage on initial render
   useEffect(() => {
     const storedFavorites = localStorage.getItem("favoriteGames");
     if (storedFavorites) {
@@ -67,12 +66,10 @@ const GameList = () => {
     }
   }, []);
 
-  // Save favorites to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem("favoriteGames", JSON.stringify(favorites));
   }, [favorites]);
 
-  // Parse query parameters and update filters
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
     const category = params.get("category") || "";
@@ -80,24 +77,23 @@ const GameList = () => {
     const searchQuery = params.get("search") || "";
 
     setSelectedCategory(category);
-    setSelectedBrand(brand);
+    setSelectedBrands(brand ? brand.split(",") : []);
     setSearch(searchQuery);
   }, [searchParams]);
 
-  // Update URL dynamically (shallow routing) when filters change
   useEffect(() => {
     const params = new URLSearchParams();
 
     if (selectedCategory) params.set("category", selectedCategory);
-    if (selectedBrand) params.set("brand", selectedBrand);
+    if (selectedBrands.length > 0)
+      params.set("brand", selectedBrands.join(","));
     if (search) params.set("search", search);
 
     const newQuery = params.toString();
     console.log("Updating URL with query parameters:", newQuery);
     router.push(`?${newQuery}`, { shallow: true });
-  }, [selectedCategory, selectedBrand, search]);
+  }, [selectedCategory, selectedBrands, search]);
 
-  // Filter games based on the current filters
   useEffect(() => {
     const filterGames = () => {
       console.log("Filtering games based on query parameters...");
@@ -111,9 +107,9 @@ const GameList = () => {
         );
       }
 
-      if (selectedBrand) {
-        filtered = filtered.filter(
-          (game) => game.BrandId === parseInt(selectedBrand)
+      if (selectedBrands.length > 0) {
+        filtered = filtered.filter((game) =>
+          selectedBrands.includes(String(game.BrandId))
         );
       }
 
@@ -128,7 +124,7 @@ const GameList = () => {
     };
 
     filterGames();
-  }, [selectedCategory, selectedBrand, search, favorites, allGames]);
+  }, [selectedCategory, selectedBrands, search, favorites, allGames]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -146,40 +142,49 @@ const GameList = () => {
 
   return (
     <div className="flex flex-col h-screen bg-[#f2f2f2]">
-      {/* Header Section */}
-      <header className="w-full bg-white shadow sticky top-0 z-50">
+      <header className="w-full bg-[#181818] shadow sticky top-0 z-50">
         <div className="p-4 flex flex-wrap items-center justify-between gap-4">
-          {/* Category Filter (Left) */}
           <div className="flex-shrink-0">
             <CategoryFilter
               selectedCategory={selectedCategory}
               onCategorySelect={setSelectedCategory}
             />
           </div>
-
-          {/* Brand Filter and Search Input (Right) */}
-          <div className="flex items-center gap-4 flex-wrap">
-            {/* Provider Filter */}
+          <div className="flex items-center gap-4 ">
             <div className="relative">
               <BrandFilter
-                selectedBrand={selectedBrand}
-                onBrandSelect={setSelectedBrand}
+                selectedBrand={selectedBrands}
+                onBrandSelect={setSelectedBrands}
               />
             </div>
-
-            {/* Search Input */}
-            <input
-              type="text"
-              placeholder="Search by name..."
-              value={search}
-              onChange={handleSearchChange}
-              className="w-full md:w-[40%] p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <div className="relative w-full lg:w-[40%]">
+              <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-4.35-4.35m-1.45-1.45A7 7 0 1116 9a7 7 0 01-7 7z"
+                  />
+                </svg>
+              </span>
+              <input
+                type="text"
+                placeholder="Search by name..."
+                value={search}
+                onChange={handleSearchChange}
+                className="w-full pl-10 py-2 bg-[#292929] text-white rounded placeholder-white focus:outline-none"
+              />
+            </div>
           </div>
         </div>
       </header>
-
-      {/* Main Content */}
       <main className="flex-grow p-4">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8 gap-4">
           {filteredGames.length > 0 ? (
