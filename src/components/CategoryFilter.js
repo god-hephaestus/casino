@@ -43,22 +43,22 @@ const CategoryFilter = ({ onCategorySelect }) => {
 
   return (
     <div>
-      <ul className="flex flex-wrap gap-4 p-2">
+      <ul className="flex flex-wrap justify-center gap-4 p-2">
         <li
-          className={`text-sm text-white  cursor-pointer px-4 py-2 rounded ${
+          className={`text-lg lg:text-sm text-white h-32 w-32 lg:h-auto lg:w-auto flex justify-center items-center  cursor-pointer px-4 py-2 rounded ${
             selectedCategory === ""
-              ? "bg-[#2f2f2f] border-b-4 border-[#007d2d]"
-              : "hover:border-b-4 hover:border-[#007d2d]"
+              ? "bg-[#2f2f2f] border-b-8 lg:border-b-4 border-[#007d2d]"
+              : "bg-[#2f2f2f] lg:bg-transparent hover:border-b-4 hover:border-[#007d2d]"
           }`}
           onClick={() => handleCategorySelect("")}
         >
           All
         </li>
         <li
-          className={`text-sm text-white  cursor-pointer px-4 py-2 rounded ${
+          className={`text-lg lg:text-sm text-white h-32 w-32 lg:h-auto lg:w-auto flex justify-center items-center  cursor-pointer px-4 py-2 rounded ${
             selectedCategory === "favorites"
-              ? "bg-[#2f2f2f] border-b-4 border-[#007d2d]"
-              : "hover:border-b-4 hover:border-[#007d2d]"
+              ? "bg-[#2f2f2f] border-b-8 lg:border-b-4 border-[#007d2d]"
+              : "bg-[#2f2f2f] lg:bg-transparent hover:border-b-4 hover:border-[#007d2d]"
           }`}
           onClick={() => handleCategorySelect("favorites")}
         >
@@ -67,10 +67,10 @@ const CategoryFilter = ({ onCategorySelect }) => {
         {categories.map((category) => (
           <li
             key={category.Id}
-            className={`text-sm text-white cursor-pointer px-4 py-2 rounded ${
+            className={`text-lg lg:text-sm text-white h-32 w-32 lg:h-auto lg:w-auto flex justify-center items-center  cursor-pointer px-4 py-2 rounded ${
               selectedCategory === category.Id
-                ? "bg-[#2f2f2f] border-b-4 border-[#007d2d]"
-                : "hover:border-b-4 hover:border-[#007d2d]"
+                ? "bg-[#2f2f2f] border-b-8 lg:border-b-4 border-[#007d2d]"
+                : "bg-[#2f2f2f] lg:bg-transparent hover:border-b-4 hover:border-[#007d2d]"
             }`}
             onClick={() => handleCategorySelect(category.Id)}
           >

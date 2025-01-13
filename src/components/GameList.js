@@ -140,7 +140,7 @@ const GameList = () => {
     <div className="flex flex-col h-screen bg-[#f2f2f2]">
       <header className="w-full bg-[#181818] shadow sticky top-0 z-50">
         <div className="p-4 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex-shrink-0 hidden md:block">
+          <div className="flex-shrink-0 hidden lg:block">
             <CategoryFilter
               selectedCategory={selectedCategory}
               onCategorySelect={setSelectedCategory}
