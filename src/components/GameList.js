@@ -3,7 +3,51 @@ import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CategoryFilter from "./CategoryFilter";
 import BrandFilter from "./BrandFilter";
-import MobileBarPopup from "./MobileBarPopup"; // Import the new component
+import MobileBarPopup from "./MobileBarPopup";
+
+const GameDetailsPopup = ({ game, onClose }) => {
+  if (!game) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `url(${game.ImageUrl.trim()})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "blur(20px)",
+          zIndex: -1,
+        }}
+      ></div>
+
+      <div className="flex flex-col items-center w-screen h-screen bg-black bg-opacity-60 text-white ">
+        <button
+          className="absolute top-4 right-4 text-white bg-black bg-opacity-50 px-4 py-2 rounded hover:bg-opacity-70"
+          onClick={onClose}
+        >
+          Close
+        </button>
+        <h2 className="mt-24 text-md font-bold mb-4 text-center">
+          {game.Name}
+        </h2>
+        <img
+          src={game.ImageUrl.trim()}
+          alt={game.Name}
+          className="w-[90%] rounded-lg mb-6"
+        />
+        <button className="px-6 py-3 w-[90%] bg-[#efbe30] text-black rounded hover:bg-[#a2802e] mb-4">
+          Play Now
+        </button>
+        {game.HasDemo && (
+          <button className="px-6 py-3 w-[90%] bg-[#007d2d] text-white rounded hover:bg-[#00491f]">
+            Play Demo
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const GameList = () => {
   const router = useRouter();
@@ -12,9 +56,11 @@ const GameList = () => {
   const [allGames, setAllGames] = useState([]);
   const [filteredGames, setFilteredGames] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedBrands, setSelectedBrands] = useState([]); // Updated to support multiple selections
+  const [selectedBrands, setSelectedBrands] = useState([]);
   const [search, setSearch] = useState("");
   const [favorites, setFavorites] = useState([]);
+  const [isMobilePopupOpen, setIsMobilePopupOpen] = useState(false);
+  const [selectedGame, setSelectedGame] = useState(null);
 
   useEffect(() => {
     const fetchAllGames = async () => {
@@ -122,6 +168,18 @@ const GameList = () => {
     filterGames();
   }, [selectedCategory, selectedBrands, search, favorites, allGames]);
 
+  const handleGameClick = (game) => {
+    if (window.innerWidth < 1024) {
+      setSelectedGame(game);
+      setIsMobilePopupOpen(true);
+    }
+  };
+
+  const closeMobilePopup = () => {
+    setIsMobilePopupOpen(false);
+    setSelectedGame(null);
+  };
+
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
   };
@@ -189,9 +247,13 @@ const GameList = () => {
                 <div
                   className="relative w-full h-40 bg-center bg-cover rounded-xl overflow-hidden group"
                   style={{ backgroundImage: `url(${game.ImageUrl.trim()})` }}
+                  onClick={() => handleGameClick(game)}
                 >
                   <button
-                    onClick={() => toggleFavorite(game.Id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(game.Id);
+                    }}
                     className="absolute top-2 right-2 w-9 h-9 rounded-full flex items-center justify-center transition-transform duration-200 hover:scale-110 z-20 favorite-button group-hover:opacity-100 opacity-90"
                   >
                     <span
@@ -200,8 +262,8 @@ const GameList = () => {
                       }`}
                     ></span>
                   </button>
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-70 transition-all duration-300 z-10"></div>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                  <div className="absolute inset-0 bg-black bg-opacity-0 lg:group-hover:bg-opacity-70 transition-all duration-300 z-10"></div>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 z-10">
                     <p className="font-semibold text-xs">{game.BrandName}</p>
                     <div className="my-2"></div>
                     <button className="px-4 py-2 bg-[#efbe30] min-w-[50%] rounded text-black flex items-center justify-center gap-2 hover:bg-[#a2802e]">
@@ -222,6 +284,10 @@ const GameList = () => {
           )}
         </div>
       </main>
+
+      {isMobilePopupOpen && (
+        <GameDetailsPopup game={selectedGame} onClose={closeMobilePopup} />
+      )}
 
       <MobileBarPopup />
     </div>
