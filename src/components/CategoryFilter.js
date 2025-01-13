@@ -43,22 +43,26 @@ const CategoryFilter = ({ onCategorySelect }) => {
 
   return (
     <div>
-      <h3 className="text-yellow-500">Categories</h3>
+      <h3 className="text-black h-[30px] mt-[20px] mx-[5px] pl-[6px] text-[1.1rem] font-semibold">
+        Categories
+      </h3>
       <ul>
         <li
-          style={{
-            cursor: "pointer",
-            fontWeight: selectedCategory === "" ? "bold" : "normal",
-          }}
+          className={`text-sm cursor-pointer p-2 rounded ${
+            selectedCategory === ""
+              ? "bg-[#2f2f2f] text-white border-l-4 border-[#007d2d]"
+              : "text-black hover:bg-gray-200"
+          }`}
           onClick={() => handleCategorySelect("")}
         >
           All
         </li>
         <li
-          style={{
-            cursor: "pointer",
-            fontWeight: selectedCategory === "favorites" ? "bold" : "normal",
-          }}
+          className={`text-sm cursor-pointer p-2 rounded ${
+            selectedCategory === "favorites"
+              ? "bg-[#2f2f2f] text-white border-l-4 border-[#007d2d]"
+              : "text-black hover:bg-gray-200"
+          }`}
           onClick={() => handleCategorySelect("favorites")}
         >
           Favorites
@@ -66,10 +70,11 @@ const CategoryFilter = ({ onCategorySelect }) => {
         {categories.map((category) => (
           <li
             key={category.Id}
-            style={{
-              cursor: "pointer",
-              fontWeight: selectedCategory === category.Id ? "bold" : "normal",
-            }}
+            className={`text-sm cursor-pointer p-2 rounded ${
+              selectedCategory === category.Id
+                ? "bg-[#2f2f2f] text-white border-l-4 border-[#007d2d]"
+                : "text-black hover:bg-gray-200"
+            }`}
             onClick={() => handleCategorySelect(category.Id)}
           >
             {category.Name}

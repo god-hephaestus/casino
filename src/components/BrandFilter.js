@@ -41,18 +41,34 @@ const BrandFilter = ({ onBrandSelect }) => {
 
   return (
     <div>
-      <h3>Brands</h3>
-      <select
-        value={selectedBrand}
-        onChange={(e) => handleBrandSelect(e.target.value)}
-      >
-        <option value="">All Brands</option>
+      <h3 className="text-black h-[30px] mt-[20px] mx-[5px] pl-[6px] text-[1.1rem] font-semibold">
+        Brands
+      </h3>
+      <ul>
+        <li
+          className={`text-sm cursor-pointer p-2 rounded ${
+            selectedBrand === ""
+              ? "bg-[#2f2f2f] text-white border-l-4 border-[#007d2d]"
+              : "text-black hover:bg-gray-200"
+          }`}
+          onClick={() => handleBrandSelect("")}
+        >
+          All Brands
+        </li>
         {brands.map((brand) => (
-          <option key={brand.Id} value={brand.Id}>
+          <li
+            key={brand.Id}
+            className={`text-sm cursor-pointer p-2 rounded ${
+              selectedBrand === brand.Id
+                ? "bg-[#2f2f2f] text-white border-l-4 border-[#007d2d]"
+                : "text-black hover:bg-gray-200"
+            }`}
+            onClick={() => handleBrandSelect(brand.Id)}
+          >
             {brand.Name}
-          </option>
+          </li>
         ))}
-      </select>
+      </ul>
     </div>
   );
 };
